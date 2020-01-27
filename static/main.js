@@ -7,7 +7,7 @@ class Profile {
 
     createUser(callback) {
         console.log("I'm adding new user");
-        return ApiConnector.createUser(this, (err, data) => {
+        return ApiConnector.createUser({ username: this.userName, name: this.name, password: this.password }, (err, data) => {
             console.log(`Added new user ${this.userName}`);
             callback(err, data);
         });
@@ -15,7 +15,7 @@ class Profile {
 
     performLogin(callback) {
         console.log("Authorization...");
-        return ApiConnector.performLogin(this, (err, data) => {
+        return ApiConnector.performLogin({ username: this.userName, password: this.password }, (err, data) => {
             console.log(`Hello, ${this.userName}!`);
             callback(err, data);
         });
@@ -48,29 +48,76 @@ class Profile {
 }
 
 function alertCollback(err, data) {
-    console.log(err);
+    if (err) {
+        console.log("Warning!");
+        console.log(err);
+    }
 }
 
 function getStocks() {
 
-    let rates = ApiConnector.getStocks(alertCollback);
-    return rates;
-}
+    ApiConnector.getStocks((err, data) => {
+        if (err) {
+            console.log("Warning");
+            console.log(err);
+        } else {
+            console.log(data);
+            return data;
+        };
+    });
 
-console.log(getStocks());
+}
 
 function main() {
-    const newUser = new Profile("Sumkin", { firstName: "Frodo", lastName: "Baggins" }, "1234");
-    const newUserTwo = new Profile("Senya", { firstName: "Sam", lastName: "Gamgee" }, "0987");
-    newUser.createUser(alertCollback);
-    newUser.performLogin(alertCollback);
-    newUser.addMoney({ currency: "USD", amount: "100" }, alertCollback);
+    console.log("what ?!");
+    // const Sumkin = new Profile("Sumkin", { firstName: "Frodo", lastName: "Baggins" }, "1234");
+    // console.log("1" + Sumkin.userName);
+    // console.log("2" + Sumkin.name);
+    // // Sumkin.createUser(alertCollback);
+    // Sumkin.performLogin(alertCollback);
 
-    const rates = getStocks();
+    // const transferMoney = {
+    //     currency: "RUB",
+    //     amount: 100
+    // };
 
-    newUser.convertMoney({ fromCurrency: "USD", targetCurrency: "Netcoin", targetAmount: amount }, alertCollback);
+    // Sumkin.addMoney(transferMoney, (err, data) => {
+    //     if (err) {
+    //         console.error(`Error during adding money to ${Sumkin.userName}`);
+    //     } else {
+    //         console.log(`Added ${transferMoney.amount} ${transferMoney.amount} to ${Sumkin.userName}`);
+    //     }
+    // });
+    // const targetCurrency = "NETCOIN";
+    // const rates = getStocks();
+    // const course = getTargetAmount(rates, transferMoney.currency, targetCurrency, transferMoney.amount);
+    // console.log(course);
+    // const amount = transferMoney.amount * course;
 
+    // newUser.convertMoney({
+    //     fromCurrency: transferMoney.currency,
+    //     targetCurrency: targetCurrency,
+    //     targetAmount: amount
+    // }, alertCollback);
 
-    newUserTwo.createUser(alertCollback);
+    // const Senya = new Profile({
+    //     username: "Senya",
+    //     name: { firstName: "Sam", lastName: "Gamgee" },
+    //     password: "0987"
+    // });
+
 
 }
+
+function getTargetAmount(rates, fromCurrency, targetCurrency, amount) {
+
+    const textOfFind = targetCurrency + "_" + fromCurrency;
+    const reverseTextOfFind = fromCurrency + "_" + targetCurrency;
+
+    return rates
+        .filter(item => item[reverseTextOfFind] === amount)
+        .map(item => item[textOfFind])
+
+}
+
+main()
