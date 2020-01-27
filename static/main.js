@@ -1,22 +1,22 @@
 class Profile {
-    constructor(userName, name, password) {
-        this.userName = userName;
+    constructor(username, name, password) {
+        this.username = username;
         this.name = name;
         this.password = password;
     }
 
     createUser(callback) {
         console.log("I'm adding new user");
-        return ApiConnector.createUser({ username: this.userName, name: this.name, password: this.password }, (err, data) => {
-            console.log(`Added new user ${this.userName}`);
+        return ApiConnector.createUser({ username: this.username, name: this.name, password: this.password }, (err, data) => {
+            console.log(`Added new user ${this.username}`);
             callback(err, data);
         });
     }
 
     performLogin(callback) {
         console.log("Authorization...");
-        return ApiConnector.performLogin({ username: this.userName, password: this.password }, (err, data) => {
-            console.log(`Hello, ${this.userName}!`);
+        return ApiConnector.performLogin({ username: this.username, password: this.password }, (err, data) => {
+            console.log(`Hello, ${this.username}!`);
             callback(err, data);
         });
     }
@@ -49,8 +49,7 @@ class Profile {
 
 function alertCollback(err, data) {
     if (err) {
-        console.log("Warning!");
-        console.log(err);
+        console.error("Error: " + err.message);
     }
 }
 
@@ -58,10 +57,9 @@ function getStocks() {
 
     ApiConnector.getStocks((err, data) => {
         if (err) {
-            console.log("Warning");
-            console.log(err);
+            console.error(err.message);
         } else {
-            console.log(data);
+            console.log("DataSet gotten");
             return data;
         };
     });
@@ -69,35 +67,34 @@ function getStocks() {
 }
 
 function main() {
-    console.log("what ?!");
-    const Sumkin = new Profile("Sumkin", { firstName: "Frodo", lastName: "Baggins" }, "1234");
-    // console.log("1" + Sumkin.userName);
-    // console.log("2" + Sumkin.name);
+
+    const Sumkin = new Profile("Sumkin_4", { firstName: "Frodo", lastName: "Baggins" }, "1234");
     Sumkin.createUser(alertCollback);
+    sleep(500); //надо как то ждать ответа от сервера
     Sumkin.performLogin(alertCollback);
+    
+    // const transferMoney = {
+    //     currency: "RUB",
+    //     amount: 100
+    // };
 
-    const transferMoney = {
-        currency: "RUB",
-        amount: 100
-    };
+    // Sumkin.addMoney(transferMoney, (err, data) => {
+    //     if (err) {
+    //         console.error(`Error during adding money to ${Sumkin.username}`);
+    //     } else {
+    //         console.log(`Added ${transferMoney.amount} ${transferMoney.amount} to ${Sumkin.username}`);
+    //     }
+    // });
+    // const targetCurrency = "NETCOIN";
+    // const course = getTargetAmount(getStocks(), transferMoney.currency, targetCurrency, transferMoney.amount);
+    // const amount = transferMoney.amount * course;
+    // console.log(amount);
 
-    Sumkin.addMoney(transferMoney, (err, data) => {
-        if (err) {
-            console.error(`Error during adding money to ${Sumkin.userName}`);
-        } else {
-            console.log(`Added ${transferMoney.amount} ${transferMoney.amount} to ${Sumkin.userName}`);
-        }
-    });
-    const targetCurrency = "NETCOIN";
-    const course = getTargetAmount(getStocks(), transferMoney.currency, targetCurrency, transferMoney.amount);
-    console.log(course);
-    const amount = transferMoney.amount * course;
-
-    newUser.convertMoney({
-        fromCurrency: transferMoney.currency,
-        targetCurrency: targetCurrency,
-        targetAmount: amount
-    }, alertCollback);
+    // newUser.convertMoney({
+    //     fromCurrency: transferMoney.currency,
+    //     targetCurrency: targetCurrency,
+    //     targetAmount: amount
+    // }, alertCollback);
 
     // const Senya = new Profile("Senya",{ firstName: "Sam", lastName: "Gamgee" }, "0987");
 
@@ -114,5 +111,9 @@ function getTargetAmount(rates, fromCurrency, targetCurrency, amount) {
 
 }
 
-console.log("it's works");
 main();
+
+function sleep(milliseconds) {
+    let e = new Date().getTime() + milliseconds;
+    while (new Date().getTime() <= e) { }
+}
