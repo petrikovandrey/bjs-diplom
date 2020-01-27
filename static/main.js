@@ -70,42 +70,36 @@ function getStocks() {
 
 function main() {
     console.log("what ?!");
-    // const Sumkin = new Profile("Sumkin", { firstName: "Frodo", lastName: "Baggins" }, "1234");
+    const Sumkin = new Profile("Sumkin", { firstName: "Frodo", lastName: "Baggins" }, "1234");
     // console.log("1" + Sumkin.userName);
     // console.log("2" + Sumkin.name);
-    // // Sumkin.createUser(alertCollback);
-    // Sumkin.performLogin(alertCollback);
+    Sumkin.createUser(alertCollback);
+    Sumkin.performLogin(alertCollback);
 
-    // const transferMoney = {
-    //     currency: "RUB",
-    //     amount: 100
-    // };
+    const transferMoney = {
+        currency: "RUB",
+        amount: 100
+    };
 
-    // Sumkin.addMoney(transferMoney, (err, data) => {
-    //     if (err) {
-    //         console.error(`Error during adding money to ${Sumkin.userName}`);
-    //     } else {
-    //         console.log(`Added ${transferMoney.amount} ${transferMoney.amount} to ${Sumkin.userName}`);
-    //     }
-    // });
-    // const targetCurrency = "NETCOIN";
-    // const rates = getStocks();
-    // const course = getTargetAmount(rates, transferMoney.currency, targetCurrency, transferMoney.amount);
-    // console.log(course);
-    // const amount = transferMoney.amount * course;
+    Sumkin.addMoney(transferMoney, (err, data) => {
+        if (err) {
+            console.error(`Error during adding money to ${Sumkin.userName}`);
+        } else {
+            console.log(`Added ${transferMoney.amount} ${transferMoney.amount} to ${Sumkin.userName}`);
+        }
+    });
+    const targetCurrency = "NETCOIN";
+    const course = getTargetAmount(getStocks(), transferMoney.currency, targetCurrency, transferMoney.amount);
+    console.log(course);
+    const amount = transferMoney.amount * course;
 
-    // newUser.convertMoney({
-    //     fromCurrency: transferMoney.currency,
-    //     targetCurrency: targetCurrency,
-    //     targetAmount: amount
-    // }, alertCollback);
+    newUser.convertMoney({
+        fromCurrency: transferMoney.currency,
+        targetCurrency: targetCurrency,
+        targetAmount: amount
+    }, alertCollback);
 
-    // const Senya = new Profile({
-    //     username: "Senya",
-    //     name: { firstName: "Sam", lastName: "Gamgee" },
-    //     password: "0987"
-    // });
-
+    // const Senya = new Profile("Senya",{ firstName: "Sam", lastName: "Gamgee" }, "0987");
 
 }
 
@@ -120,4 +114,5 @@ function getTargetAmount(rates, fromCurrency, targetCurrency, amount) {
 
 }
 
-main()
+console.log("it's works");
+main();
