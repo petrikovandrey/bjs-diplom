@@ -16,7 +16,7 @@ class Profile {
     performLogin(callback) {
         console.log("Authorization...");
         return ApiConnector.performLogin({ username: this.username, password: this.password }, (err, data) => {
-            console.log(`Hello, ${this.username}!`);
+            console.log(`Welcome, ${this.username}!`);
             callback(err, data);
         });
     }
@@ -24,7 +24,7 @@ class Profile {
     addMoney({ currency, amount }, callback) {
         console.log(`Adding ${amount} of ${currency} to ${this.username}`);
         return ApiConnector.addMoney({ currency, amount }, (err, data) => {
-            console.log(`Added ${amount} of ${currency} to ${this.username}`);
+            console.log(`Done. ${amount} ${currency} for ${this.username}`);
             callback(err, data);
         });
     }
@@ -49,16 +49,26 @@ class Profile {
 
 function alertCollback(err) {
     if (err) {
-        console.log(`Error message: ${err.message}`);
+        console.log(`Error message: (${err.code}) ${err.message}`);
         return err;
     }
+}
+
+function getTargetAmount(rates, fromCurrency, targetCurrency, amount) {
+
+    const textOfFind = targetCurrency + "_" + fromCurrency;
+    const reverseTextOfFind = fromCurrency + "_" + targetCurrency;
+
+    return rates
+        .filter(item => item[reverseTextOfFind] === amount)
+        .map(item => item[textOfFind])
 }
 
 function getStocks() {
 
     ApiConnector.getStocks((err, data) => {
         if (err) {
-            console.log(`Error message: ${err.message}`);
+            console.log(`Error message: (${err.code}) ${err.message}`);
         } else {
             return data;
         };
@@ -68,9 +78,9 @@ function getStocks() {
 
 function main() {
 
-    const Sumkin = new Profile("Sumkin_8", { firstName: "Frodo", lastName: "Baggins" }, "1234");
+    const Sumkin = new Profile("Sumkin", { firstName: "Frodo", lastName: "Baggins" }, "1234");
     Sumkin.createUser(alertCollback);
-
+    
     setTimeout(() => {
         Sumkin.performLogin(alertCollback);
     }, 2000);
@@ -79,16 +89,17 @@ function main() {
         currency: "RUB",
         amount: 100
     };
+    
     setTimeout(() => {
         Sumkin.addMoney(transferMoney, (err, data) => {
             if (err) {
-                console.error(`Error during adding money to ${Sumkin.username}`);
+                console.log(`Error during adding money to ${Sumkin.username}`);
             }
         });
 
     }, 4000);
 
-       
+
     // const targetCurrency = "NETCOIN";
     // const course = getTargetAmount(getStocks(), transferMoney.currency, targetCurrency, transferMoney.amount);
     // const amount = transferMoney.amount * course;
@@ -110,27 +121,5 @@ function main() {
 
 }
 
-function getTargetAmount(rates, fromCurrency, targetCurrency, amount) {
-
-    const textOfFind = targetCurrency + "_" + fromCurrency;
-    const reverseTextOfFind = fromCurrency + "_" + targetCurrency;
-
-    return rates
-        .filter(item => item[reverseTextOfFind] === amount)
-        .map(item => item[textOfFind])
-
-}
 
 main();
-
-
-
-// function performLogin(object,collback) {
-
-// }
-
-
-function sleep(milliseconds) {
-    let e = new Date().getTime() + milliseconds;
-    while (new Date().getTime() <= e) { }
-}
