@@ -39,7 +39,7 @@ class Profile {
 
     transferMoney({ to, amount }, callback) {
         console.log(`Transferring ${amount} to ${to}`);
-        return ApiConnector.convertMoney({ fromCurrency, targetCurrency, targetAmount }, (err, data) => {
+        return ApiConnector.transferMoney({ to, amount }, (err, data) => {
             console.log(`Done.  ${to} got transfer`);
             callback(err, data);
         });
@@ -47,9 +47,10 @@ class Profile {
 
 }
 
-function alertCollback(err, data) {
+function alertCollback(err) {
     if (err) {
-        console.error("Error: " + err.message);
+        console.log(`Error message: ${err.message}`);
+        return err;
     }
 }
 
@@ -57,9 +58,8 @@ function getStocks() {
 
     ApiConnector.getStocks((err, data) => {
         if (err) {
-            console.error(err.message);
+            console.log(`Error message: ${err.message}`);
         } else {
-            console.log("DataSet gotten");
             return data;
         };
     });
@@ -68,35 +68,45 @@ function getStocks() {
 
 function main() {
 
-    const Sumkin = new Profile("Sumkin_4", { firstName: "Frodo", lastName: "Baggins" }, "1234");
+    const Sumkin = new Profile("Sumkin_8", { firstName: "Frodo", lastName: "Baggins" }, "1234");
     Sumkin.createUser(alertCollback);
-    sleep(500); //надо как то ждать ответа от сервера
-    Sumkin.performLogin(alertCollback);
-    
-    // const transferMoney = {
-    //     currency: "RUB",
-    //     amount: 100
-    // };
 
-    // Sumkin.addMoney(transferMoney, (err, data) => {
-    //     if (err) {
-    //         console.error(`Error during adding money to ${Sumkin.username}`);
-    //     } else {
-    //         console.log(`Added ${transferMoney.amount} ${transferMoney.amount} to ${Sumkin.username}`);
-    //     }
-    // });
+    setTimeout(() => {
+        Sumkin.performLogin(alertCollback);
+    }, 2000);
+
+    const transferMoney = {
+        currency: "RUB",
+        amount: 100
+    };
+    setTimeout(() => {
+        Sumkin.addMoney(transferMoney, (err, data) => {
+            if (err) {
+                console.error(`Error during adding money to ${Sumkin.username}`);
+            }
+        });
+
+    }, 4000);
+
+       
     // const targetCurrency = "NETCOIN";
     // const course = getTargetAmount(getStocks(), transferMoney.currency, targetCurrency, transferMoney.amount);
     // const amount = transferMoney.amount * course;
     // console.log(amount);
 
-    // newUser.convertMoney({
-    //     fromCurrency: transferMoney.currency,
-    //     targetCurrency: targetCurrency,
-    //     targetAmount: amount
-    // }, alertCollback);
+    // setTimeout(() => {
+    //     Sumkin.convertMoney({
+    //         fromCurrency: transferMoney.currency,
+    //         targetCurrency: targetCurrency,
+    //         targetAmount: amount
+    //     }, alertCollback);
 
-    // const Senya = new Profile("Senya",{ firstName: "Sam", lastName: "Gamgee" }, "0987");
+    // }, 6000);
+
+    // const Senya = new Profile("Senya", { firstName: "Sam", lastName: "Gamgee" }, "0987");
+    // setTimeout(() => {
+    //     Sumkin.transferMoney({ Senya, amount }, alertCollback);
+    // }, 8000);
 
 }
 
@@ -112,6 +122,13 @@ function getTargetAmount(rates, fromCurrency, targetCurrency, amount) {
 }
 
 main();
+
+
+
+// function performLogin(object,collback) {
+
+// }
+
 
 function sleep(milliseconds) {
     let e = new Date().getTime() + milliseconds;
