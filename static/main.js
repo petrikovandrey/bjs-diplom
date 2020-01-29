@@ -30,9 +30,9 @@ class Profile {
     }
 
     convertMoney({ fromCurrency, targetCurrency, targetAmount }, callback) {
-        console.log(`Convert ${fromCurrency} to ${targetCurrency} = ${targetAmount}`);
+        console.log(`Convert ${fromCurrency} to ${targetCurrency}`);
         return ApiConnector.convertMoney({ fromCurrency, targetCurrency, targetAmount }, (err, data) => {
-            console.log(`Your account is replenished ${amount} ${currency}`);
+            console.log(`Your account is replenished ${targetAmount} ${targetCurrency}`);
             callback(err, data);
         });
     }
@@ -47,31 +47,21 @@ class Profile {
 
 }
 
-function alertCollback(err) {
-    if (err) {
-        console.log(`Error message: (${err.code}) ${err.message}`);
-        return err;
-    }
-}
 
 function getTargetAmount(rates, fromCurrency, targetCurrency, amount) {
 
     const textOfFind = targetCurrency + "_" + fromCurrency;
     const reverseTextOfFind = fromCurrency + "_" + targetCurrency;
+    const revRates = rates.reverse();
+    const result = revRates.find(item => item[textOfFind] === amount);
 
-    return rates
-        .filter(item => item[reverseTextOfFind] === amount)
-        .map(item => item[textOfFind])
+    return result[reverseTextOfFind];
 }
 
-function getStocks() {
+function getStocks(callback) {
 
     ApiConnector.getStocks((err, data) => {
-        if (err) {
-            console.log(`Error message: (${err.code}) ${err.message}`);
-        } else {
-            return data;
-        };
+        callback(err, data);
     });
 
 }
@@ -79,46 +69,63 @@ function getStocks() {
 function main() {
 
     const Sumkin = new Profile("Sumkin", { firstName: "Frodo", lastName: "Baggins" }, "1234");
-    Sumkin.createUser(alertCollback);
-    
-    setTimeout(() => {
-        Sumkin.performLogin(alertCollback);
-    }, 2000);
+    const Senya = new Profile("Senya", { firstName: "Sam", lastName: "Gamgee" }, "0987");
 
-    const transferMoney = {
-        currency: "RUB",
-        amount: 100
-    };
-    
-    setTimeout(() => {
-        Sumkin.addMoney(transferMoney, (err, data) => {
-            if (err) {
-                console.log(`Error during adding money to ${Sumkin.username}`);
-            }
-        });
+    Senya.createUser((err, data) => {
+        if (err) {
+            console.log(`Error message: (${err.code}) ${err.message}`);
+        };
+    });
 
-    }, 4000);
+    Sumkin.createUser((err, data) => {
+        if (err) {
+            console.log(`Error message: (${err.code}) ${err.message}`);
+        } else if (data) {
+            Sumkin.performLogin((err, data) => {
+                if (err) {
+                    console.log(`Error message: (${err.code}) ${err.message}`);
+                } else if (data) {
+                    const transferMoney = {
+                        currency: "RUB",
+                        amount: "100.000"
+                    };
+                    Sumkin.addMoney(transferMoney, (err, data) => {
+                        if (err) {
+                            console.log(`Error during adding money to ${Sumkin.username}`);
+                            console.log(`Error message: (${err.code}) ${err.message}`);
+                        } else if (data) {
+                            getStocks((err, data) => {
+                                if (err) {
+                                    console.log(`Error message: (${err.code}) ${err.message}`);
+                                } else if (data) {
+                                    const targetCurrency = "NETCOIN";
+                                    const course = getTargetAmount(data, transferMoney.currency, targetCurrency, transferMoney.amount);
+                                    const amount = transferMoney.amount * course;
 
+                                    console.log(`${amount} = ${transferMoney.amount} * ${course}`);
 
-    // const targetCurrency = "NETCOIN";
-    // const course = getTargetAmount(getStocks(), transferMoney.currency, targetCurrency, transferMoney.amount);
-    // const amount = transferMoney.amount * course;
-    // console.log(amount);
+                                    Sumkin.convertMoney({
+                                        fromCurrency: transferMoney.currency,
+                                        targetCurrency: targetCurrency,
+                                        targetAmount: amount
+                                    }, (err, data) => {
+                                        if (err) {
+                                            console.log(`Error message: (${err.code}) ${err.message}`);
+                                        } else if (data) {
+                                            Sumkin.transferMoney({ to: Senya.username, amount: amount }, (err, data) => {
+                                                console.log("the end");
+                                            });
+                                        };
+                                    });
+                                };
+                            });
 
-    // setTimeout(() => {
-    //     Sumkin.convertMoney({
-    //         fromCurrency: transferMoney.currency,
-    //         targetCurrency: targetCurrency,
-    //         targetAmount: amount
-    //     }, alertCollback);
-
-    // }, 6000);
-
-    // const Senya = new Profile("Senya", { firstName: "Sam", lastName: "Gamgee" }, "0987");
-    // setTimeout(() => {
-    //     Sumkin.transferMoney({ Senya, amount }, alertCollback);
-    // }, 8000);
-
+                        };
+                    });
+                };
+            });
+        };
+    });
 }
 
 
