@@ -99,7 +99,10 @@ function main() {
                                     console.log(`Error message: (${err.code}) ${err.message}`);
                                 } else if (data) {
                                     const targetCurrency = "NETCOIN";
-                                    const course = getTargetAmount(data, transferMoney.currency, targetCurrency, transferMoney.amount);
+                                    const course = getTargetAmount(data, 
+                                        transferMoney.currency, 
+                                        targetCurrency, 
+                                        transferMoney.amount);
                                     const amount = transferMoney.amount * course;
 
                                     console.log(`${amount} = ${transferMoney.amount} * ${course}`);
